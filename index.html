@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resume BuilderX by Koustav Dey - MVP</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 { text-align: center; }
+    label { display: block; margin-top: 10px; }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    #resume-preview {
+      background: #e0e0e0;
+      padding: 20px;
+      margin-top: 20px;
+      white-space: pre-wrap;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>ATS Resume Generator (MVP)</h2>
+
+    <label for="name">Full Name</label>
+    <input type="text" id="name" />
+
+    <label for="email">Email</label>
+    <input type="text" id="email" />
+
+    <label for="phone">Phone</label>
+    <input type="text" id="phone" />
+
+    <label for="skills">Skills (comma separated)</label>
+    <input type="text" id="skills" />
+
+    <label for="summary">Professional Summary</label>
+    <textarea id="summary" rows="4"></textarea>
+
+    <label for="experience">Experience / Projects</label>
+    <textarea id="experience" rows="4"></textarea>
+
+    <button onclick="generateResume()">Generate Resume</button>
+    <button onclick="downloadResume()">Download PDF</button>
+
+    <div id="resume-preview"></div>
+    <div id="resume-wrapper">
+  <div id="resume-preview"></div>
+</div>
+
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script>
+  function generateResume() {
+  const name = document.getElementById('name').value;
+  const email = document.getElementById('email').value;
+  const phone = document.getElementById('phone').value;
+  const skills = document.getElementById('skills').value;
+  const summary = document.getElementById('summary').value.replace(/\n/g, '<br>');
+  const experience = document.getElementById('experience').value.replace(/\n/g, '<br>');
+
+  const previewHTML = `
+    <div style="background:#f0f0f0;padding:20px;font-family:Arial;">
+      <h2 style="margin-bottom: 0;">${name}</h2>
+      <p style="margin: 5px 0;">${email} | ${phone}</p>
+      <hr>
+      <h3>Summary</h3>
+      <p>${summary}</p>
+      <h3>Skills</h3>
+      <p>${skills}</p>
+      <h3>Experience / Projects</h3>
+      <p>${experience}</p>
+    </div>
+  `;
+
+  document.getElementById('resume-preview').innerHTML = previewHTML;
+}
+
+  function downloadResume() {
+  const element = document.getElementById('resume-preview');
+  if (!element.innerHTML.trim()) {
+    alert("Please generate your resume first.");
+    return;
+  }
+
+  const opt = {
+    margin: 0.5,
+    filename: 'My_Resume.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+  };
+
+  html2pdf().set(opt).from(element).save();
+}
+
+</script>
+</body>
+</html>
