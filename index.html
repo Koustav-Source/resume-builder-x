@@ -183,15 +183,27 @@
     : "Write a resume project/experience description for someone with skills in HTML, CSS, JS";
 
   try {
-    const response = await fetch("https://script.google.com/macros/s/AKfycbwKf7KIdgrRZED_-OVAjhWO8II7ml_zKKyu2c4uM8IY6kSMX1j4753bpZuGKJ6VtDoR/exec", {
+    const response = await fetch("https://script.google.com/macros/s/AKfycbwPguB-XPSTorzW5uZ1ZMkWo-DUWyN8w8wtuPnIgWi4PGKCgK0tPqcVuEnkxdQwG9Fl/exec", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt })
     });
 
-    const text = await response.text();
-    const data = JSON.parse(text);
-    const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "AI Error";
+
+    const resultText = await response.text();
+
+    // Safely parse and extract text
+    let aiText = "AI Error";
+    try {
+      const data = JSON.parse(resultText);
+      aiText =
+        data.candidates?.[0]?.content?.parts?.[0]?.text ||
+        data.text ||
+        data.message ||
+        JSON.stringify(data); // fallback
+    } catch (parseError) {
+      aiText = resultText; // fallback to raw response
+    }
 
     if (type === 'summary') {
       document.getElementById("summary").value = aiText;
@@ -202,6 +214,9 @@
     console.error("AI Request Error:", error);
     alert("AI failed. Please try again later.");
   }
+}
+function doGet() {
+  return ContentService.createTextOutput("✅ Gemini Resume API is live!");
 }
 
   </script>
