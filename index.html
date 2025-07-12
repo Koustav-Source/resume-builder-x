@@ -124,7 +124,9 @@
     <div class="button-group">
       <button onclick="generateResume()">Generate Resume</button>
       <button onclick="downloadResume()">Download as PDF</button>
-      
+      <button onclick="generateWithCohere('summary')">Generate Summary with AI</button>
+      <button onclick="generateWithCohere('experience')">Generate Experience with AI</button>
+
     </div>
 
     <div id="resume-wrapper">
@@ -176,46 +178,36 @@
 
       html2pdf().set(opt).from(element).save();
     }
- async function generateWithGemini(type) {
+async function generateWithCohere(type) {
   const prompt = type === 'summary'
     ? "Write a resume summary for a frontend developer skilled in HTML, CSS, JS"
     : "Write a resume project/experience description for someone with skills in HTML, CSS, JS";
 
   try {
-    const response = await fetch("https://script.google.com/macros/s/AKfycbwPguB-XPSTorzW5uZ1ZMkWo-DUWyN8w8wtuPnIgWi4PGKCgK0tPqcVuEnkxdQwG9Fl/exec", {
+    const response = await fetch("https://script.google.com/macros/s/AKfycbzVPL7wH423nQFvwwKSe26un2LsFX9QCg3pU8ArUsBFKC6w_9wVxDTYBsXYQgplcEKhjg/exec", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt })
     });
 
-
     const resultText = await response.text();
-
-    // Safely parse and extract text
     let aiText = "AI Error";
     try {
       const data = JSON.parse(resultText);
-      aiText =
-        data.candidates?.[0]?.content?.parts?.[0]?.text ||
-        data.text ||
-        data.message ||
-        JSON.stringify(data); // fallback
-    } catch (parseError) {
-      aiText = resultText; // fallback to raw response
+      aiText = data.generations?.[0]?.text || data.text || data.message || JSON.stringify(data);
+    } catch (e) {
+      aiText = resultText;
     }
 
     if (type === 'summary') {
-      document.getElementById("summary").value = aiText;
+      document.getElementById("summary").value = aiText.trim();
     } else {
-      document.getElementById("experience").value = aiText;
+      document.getElementById("experience").value = aiText.trim();
     }
   } catch (error) {
     console.error("AI Request Error:", error);
     alert("AI failed. Please try again later.");
   }
-}
-function doGet() {
-  return ContentService.createTextOutput("✅ Gemini Resume API is live!");
 }
 
   </script>
